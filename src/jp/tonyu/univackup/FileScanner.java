@@ -20,9 +20,9 @@ public class FileScanner {
 
 	public FObject scan() throws IOException {
 		try {
-			String id = MD5.crypt(src.inputStream());
-			FileEntry res = new FileEntry(id , src.lastModified());
 			System.out.print("Checkin "+src+"...");
+			String id = MD5.crypt(src.inputStream());
+			FileEntry res = new FileEntry(id , src);
 			System.out.println(save(src, id));			
 			
 			return res;

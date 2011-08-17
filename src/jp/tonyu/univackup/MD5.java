@@ -11,7 +11,9 @@ import java.security.NoSuchAlgorithmException;
  * ※以下コードを無保証で自由にご利用できます。
  */
 public class MD5 { 
-    /**
+    private static final String EMPTY = "d41d8cd98f00b204e9800998ecf8427e";
+
+	/**
      * MD5アルゴリズム
      * 文字列を暗号化する
      * 
@@ -41,9 +43,10 @@ public class MD5 {
      * @throws NoSuchAlgorithmException 
      */
     public static String crypt(byte [] bytes) throws NoSuchAlgorithmException {
-        if (bytes == null || bytes.length == 0) {
-            throw new IllegalArgumentException("bytes to encript cannot be null or zero length");
+        if (bytes == null ) {
+            throw new IllegalArgumentException("bytes to encript cannot be null");
         }
+        if ( bytes.length == 0) return EMPTY;
         MessageDigest digest = MessageDigest.getInstance("MD5");
         byte[] hash = digest.digest(bytes);
         
@@ -59,8 +62,11 @@ public class MD5 {
      * @throws NoSuchAlgorithmException 
      */
     public static String crypt(InputStream in) throws NoSuchAlgorithmException, IOException {
-        if (in == null || in.available() == 0) {
-            throw new IllegalArgumentException("InputStream can't be null or zero length.");
+        if (in == null ) {
+            throw new IllegalArgumentException("InputStream can't be null");
+        }
+        if (in.available() == 0) {
+        	return EMPTY;
         }
         
         MessageDigest digest = MessageDigest.getInstance("MD5");

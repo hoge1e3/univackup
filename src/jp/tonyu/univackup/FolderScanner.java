@@ -24,11 +24,14 @@ public class FolderScanner {
 		}
 	}
 	public Folder scan() throws IOException {
+		Repository r = Repository.cur.get();
 		Folder res=new Folder(src.name());
 		for (SFile f:src) {
-			res.add(f.name(), scan(f));
+			FObject scan = scan(f);
+			res.add(f.name(), scan);	
 		}
-		Repository r = Repository.cur.get();
+		res.loaded=true;
+		//res.addToDB();
 		SFile outf=r.objectFile(res.id());
 		if (!outf.exists()) {
 			res.writeTo(outf.outputStream());

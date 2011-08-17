@@ -11,4 +11,7 @@ public abstract class FObject {
 	//public abstract void writeTo(OutputStream str);
 	//public abstract long created();
 	public abstract long lastupdate();
+	public abstract long size();
+	public abstract long fileCount();
+	public abstract long folderCount();
 }

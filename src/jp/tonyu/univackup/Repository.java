@@ -5,12 +5,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import jp.tonyu.univackup.db.UDB;
 import jp.tonyu.util.Context;
 import jp.tonyu.util.Date;
 import jp.tonyu.util.SFile;
 
 public class Repository {
 	SFile home;
+	UDB udb;
+	public UDB udb() {
+		return udb;
+	}
 	public static final Context<Repository> cur=new Context<Repository>();
 	public Repository(SFile h) {
 		home=h;
@@ -36,7 +41,7 @@ public class Repository {
 			public void run() {
 				try {
 					FObject r = FolderScanner.scan(f);
-					newCiFile().text("id: "+r.id()+"\nsrc: "+f.fullPath()+"\n");
+					newCiFile().text("id\t"+r.id()+"\nsrc\t"+f.fullPath()+"\n");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
