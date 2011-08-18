@@ -24,6 +24,7 @@ public class Folder extends FObject {
 	}
 	public String id() {
 		try {
+			assertLoaded();
 			ByteArrayOutputStream out=new ByteArrayOutputStream();
 			writeTo(out);
 			byte []b=out.toByteArray();
@@ -79,21 +80,27 @@ public class Folder extends FObject {
 	}
 	private long assertSet(long value, String name) {
 		//if (value==FileEntry.NOTSET) 
-		if (!loaded) Log.die(this +" : "+name +" not a complete value");
+		assertLoaded();
 		return value;
 	}
-	public void addToDB() {
+	private void assertLoaded() {
+		if (!loaded) Log.die(this +" : "+name +" not a complete value");
+	}
+	public void addToDB() throws SqlJetException {
+		assertLoaded();
 		final Repository r = Repository.cur.get();
+		r.udb().addFolder(this);
 		Maps.entries(files).each(new MapAction<String, FObject>() {
 			
 			@Override
-			public void run(String key, FObject value) {
+			public void run(String name, FObject value) {
 				try {
-					int type;
-					if (value instanceof Folder) type=1; else type=0;
-					r.udb().addFObject(id(), type,  key,  value.lastupdate(), value.id()) ;
+					//int type;
+					//if (value instanceof Folder) type=1; else type=0;
+					r.udb().addFileEntry(id(), name, value);//  type,  name,  value.lastupdate(), value.id()) ;
 				} catch (SqlJetException e) {
 					e.printStackTrace();
+					Log.die("SQLJetException - "+e);
 				}
 			}
 		});
@@ -109,6 +116,9 @@ public class Folder extends FObject {
 	@Override
 	public long size() {
 		return assertSet(size, "size");
+	}
+	public String getName() {
+		return name;
 	}
 
 }

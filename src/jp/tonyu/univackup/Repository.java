@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.tmatesoft.sqljet.core.SqlJetException;
+import org.tmatesoft.sqljet.core.SqlJetTransactionMode;
+
+import jp.tonyu.debug.Log;
 import jp.tonyu.univackup.db.UDB;
 import jp.tonyu.util.Context;
 import jp.tonyu.util.Date;
@@ -17,8 +21,9 @@ public class Repository {
 		return udb;
 	}
 	public static final Context<Repository> cur=new Context<Repository>();
-	public Repository(SFile h) {
+	public Repository(SFile h) throws SqlJetException {
 		home=h;
+		udb=new UDB(home.rel("index.db").javaIOFile(), 1);
 	}
 	public SFile objectHome() {
 		return home.rel("objects");
@@ -40,12 +45,21 @@ public class Repository {
 			@Override
 			public void run() {
 				try {
+					udb.beginTransaction(SqlJetTransactionMode.WRITE);
 					FObject r = FolderScanner.scan(f);
-					newCiFile().text("id\t"+r.id()+"\nsrc\t"+f.fullPath()+"\n");
-				} catch (IOException e) {
+					SFile newCiFile = newCiFile();
+					newCiFile.text("id\t"+r.id()+"\nsrc\t"+f.fullPath()+"\n");
+					udb.addCiEntry(r.id(), f.fullPath(), new Date().ticks());
+					Log.d(this, "Commiting..");
+					udb.commit();
+					Log.d(this, "Commint done");
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
+	}
+	public void close() throws SqlJetException {
+		udb.close();
 	}
 }
